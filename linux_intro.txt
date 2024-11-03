@@ -1,0 +1,207 @@
+
+usr/bin = holds all command that normal user can run
+usr/sbin = holds command only root user can run
+cd - =change between previous dir
+last = users that are previously logged in
+who = which user is currently logged in
+rmdir, rm -r , 
+mkdir -p test/bin/test1 (-p means parents)
+~ = user's home directory
+/ = root directory
+w = shows what the current logged in user is doing
+id <user_name> = shows the user details
+hostname = to know the name of your server
+uname -r = current kernel version u're using
+date
+ip a = ip addr of your server
+ping = check connectivity
+history = shows all the recent commands you have ran
+echo = to display on screen(especially in shell scripting)
+su - root = switch user to root user(su is d command, '-' means load user, 'root' is the argument)
+su root = (without '-') will switch to user root but with maintain the environment var of the user b4 u switched to root
+sudo = gives regular user admin permission (all ur activities carried out using 'sudo' are logged)
+useradd <username> = adds a user
+passwd <username> = create password for a created user
+sudo su - root = since 'su - root' cmmd asks for root user passwd, using sudo befor will ask for the current user passwd instead
+
+-i = ignore the case; 
+-o = only return the occurence
+-v = ignore the occurence and return the line
+-d in ls -ld test1 = just show the property of the file or directory 
+
+tree = display files hierachy (-d option specifies only in the current dir)
+alias ll='ls -l'
+
+VIM
+:w = save, :q = quit, :q! = quit without saving :wq = save and quit; '!'=means forcefully
+u = undo last change
+dd = delete a single line
+3dd = delet 3 lines
+1yy = copy 1 line, 3yy = copy 3 lines
+p = paste
+cat /etc/os-release = file path that contains ur device os and versiong
+uname -r = current kernel version
+
+/etc/sudoer = location of sudo config file
+/var/cache  = defaul location of download using yum
+
+USER and GROUP Management
+useradd username= creates a user. Whose details are stored in a file 'passwd inside (/etc/) likewise in a /etc/group
+
+user details format - /etc/passwd
+user1:x:1000:1000:user1:/home/user1:/bin/bash
+1st = username, 2nd-x = password, 3rd-1000 = uid(userid), 4th-1000 = groupid(gid), 5th = comment, 6th = user's home dir, 7th = shell assigned to the user
+
+group format - /etc/group
+wheel:x:10:user1
+1st =  group name, 2nd = password, 3rd = gid, 4th = users in the group
+
+create user 
+sudo useradd user1 = create a new user - user1
+passwd user1 = change user1 password
+
+Users password Management - /etc/shadow
+user1:$7r6584hH8SKC9DF994:19025:0:99999:7:::
+1st = username, 2nd = password hash, 3rd = last passwd change date in unix time,4th = minimum no of days b4 u can change pass, 5th = password expiry, 6th = warning days
+
+chage -l user1 (chage is change age) = list password age of user1
+To modify these property(2 ways)
+1 - become root user and use "vi /etc/shadow" - not recommended
+2 - 'chage user1' = command to modify user1 password ppty
+
+vipw = vi editor opens the '/etc/passwd' file automatically and will not save the file if u make a mistake
+usermod -c "test user" -G wheel user2 = -c changes comment, -G adds user to the secondary group specified, -g modify primary group, -s (/usr/bin/sh) assigns the particular shell
+usermod -aG wheel user1 = -a is used to retain the user in the group its part of while -G adds the user to a new group, wheel
+userdel -r user1 = deletes user1, -r rmoves the home dir of the user
+visudo = modifies sudo file
+
+LINUX SECURITY
+1st level security - permission (basic, ACL, Special)
+2nd level security - SElinux(Security Enhanced linux-RHEL) = apart from doors and lock, this like additional security alarms u install in ur home
+3rd level security - Firewalls
+
+read - r, write-w, execute-x; r-4, w-2, x-1 
+rwx = (4+2+1=7)
+rw-rw-r-- = user owner permission, group owner permission, others
+u-owner, g-group, o-other, a-all
+CHANGING PERMISSION 
+chmod g=r-- file1.txt
+chmod u=r--,g=r--,o=--- file1.txt or chmod 440 file1.txt (1st 4 = owner, 2nd 4=group, 0=others)
+chmod 664 file1.txt (== rw-rw-r--)
+stat file1 = shows the permission(on Access line of the output) on file1 and several other things like inod
+chown <new_user_owner>:<group_owner> file1
+To make any user a root user = do 'visudo' got to root ALL and add the user following the same pattern
+
+CHAINING AND PIPING
+mkdir test;cd test;touch file1 (mkdir test && cd test && touch file1)
+ls -l | grep rpc
+wc /etc/passwd = returns no. of lines, characters and size
+grep nologin /etc/passwd | wc -l
+ls -l abc > out.txt 2> error.log (first command  will throw error bcos abc doesnt exist. But instead of outputing d error on screen, '2>' is used to save to the file error.log)
+free -h = shows cpu and mem usage, -h means in human readable format
+df (disk free)
+dmidecode -t1 = to get the serial number of your physical hardware (-t1 says limited info)
+lsblk = list block devices stored on your machine
+mount /dev/sr0 /test = assuming u created test folder and want to make ur drive available in the dir(/dev/sr0 is ur drive)
+
+
+
+KUBERNETES 
+Resources Monitoring
+Metrics server - in-memory mornitoring solution, (kubectl top nodes, kubectl top pods)
+kubectl logs <app_name> <container_name>(optionale)
+
+Networking
+Linux Networking
+
+switch
+ip link - creates interface for a switch to connect two devices
+ip addr add <ip_addrss_in_d_switch_network>
+
+router - connets 2 networks
+route - to see the existing routing config on a system
+ip route add <systemA_ip_address> via <ip_of_interface_on_router>
+ip route add default via 192.168.2.1
+
+A linux host as a network
+by default, linux doesn't forward package from one of its interface to the next.
+/proc/sys/net/ipv4/ip_forward = location to configure this forwarding - set the value there to 1 to allow the forwarding
+/etc/sysctl.conf = modify the value of net.ipv4.ip_forward to 1 to make the forwarding permanent on reboot
+
+DNS in Linux (Name Resolution)
+/etc/host = location for dns configuration in linux host
+hostname = run to know what a linux host is named
+DNS SERVER 
+/etc/resolv.conf = available in every host where u set d address of ur DNS server
+/etc/nsswitch.conf = where u configure whether to check /etc/hosts or /etc/resolv.conf first
+nslookup = use to querry a hostname from a dns server. (doesn't consider the local host file @ /etc/hosts). To consider, use 'dig <address>'
+
+Network Namespaces (we can use namespace to prevent a container from seeing the host interface)
+ps aux = list processes running
+ip netns add <namespaces_name> = creates a network namespace 
+ip netns = lists all the Namespaces
+ip netns exec <namespace_name> ip link or ip -n <namespace_name> link = to list interface present in the host from within a namespace
+ip link add veth-red type veth peer name veth-blue = creates a pipe otherwise cable(veth-red and veth-blue are d interfaces to be attached to 2 diff namespaces)
+ip link set <namespace_interface> netns <namespace_name> = attach interface to namespace
+ip -n <namespace_name> addr add <ip_address> dev <namespace_interface> = attach ip to the interface
+ip -n <namespace_name(red)> link set veth-red up = brings up the interface
+ip netns exec red ping <ip_address>
+ip -n red link del veth-red = to delete the pipe created which will delete the interfaces too
+
+- Create a virtual switch within ur linux host to connect multiple interface in ur host
+- Native solution known as Linux bridge can be used
+
+ip link add <switch_name_or_ip_addr(v-net-0)> type bridge = creates a bridge network(just another interface to our linux host)
+ip link set dev v-net-0 up = to bring it up
+- now create pipes(cable) to connect each namespace to the bridge
+ip link add veth-red type veth peer name veth-blue-br = creates the cable with the interfaces(veth-red and veth-red-br)
+ip link set veth-red netns red = attach the veth-red interface to the red namespace
+ip link set veth-red-br master v-net-0 =attach the veth-red interface to d bridge
+- now set ip for the links
+ip -n red addr add <ip_address> dev veth-red = assigns ip to the veth-red interface
+ip -n red link set veth-red up = brings up the connection
+
+- from our host, we still cannot reach all the connections we did as it is a diff network. but remember the bridge we created is an interface on the linux host
+- so we assig an ip to it. with that we can reach its network from our host
+ip addr add <ip_address/> dev v-net-0 = assigns the ip to the bridge
+- now a 'ping <ip_address/>' will reach the networks we created withing the host
+
+- But we still can't reach the outside(LAN or another linux host) of our host from within the network we created in our host. 
+- What we need to do is add info to our network to go via the interface of our linux host
+ip netns exec <namespace_name> ip route add <LAN_ip/> via <ip_of_d_bridge_created_in_our_host>
+- But to get a response back from outside network, we need to configure our host to act as a NAT
+iptables -t nat -A POSTROUTING -s <our_host_ip/> -j MASQUERADE
+
+DOCKER NETWORKING 
+- starting with a sigle docker host(a server with docker installed on it)
+network types to choose from when running docker: None - container is not connected to its host, Host - container can be reached using its host network.
+docker run --network host nginx. BRIDGE - an internal private network with the docker host and containers connected to. It is the default.
+docker network ls = list the networks created by docker when installed (docker knows d network as 'bridge' but from the host, it's known as docker0)
+A BRIDGE is then an interface to the host and a switch to the namespaces or containers within d host 
+A container can be referred to as a network namespace within a host created by docker
+
+iptables -t nat -A PREROUTING -j DNAT --dport 8080 --to-destination 80 (how docker maps a port on its host to its container port)
+iptables -nvL -t nat = lists the rules docker creates
+
+In summary
+Create Network Namespaces => Create Bridge Network/interface => Create VETH Pairs(Pipe, Virtual Cable) => attach vEth to Namespaces 
+=> Attach Other vEth to Bridge => Assign IP Addresses => Bring the interface up => Enable NAT - IP Masquerade 
+
+CONTAINER NETWORKING INTERFACE(CNI)
+The summary above was standardized and is now called BRIDGE which is a plugin for CNI. CNI defined how all the above should be implemented
+- egs of CNI are: BRIDGE, VLAN, IPVLAN, WINDOWS, MACVLAN etc including weaveworks, flannel
+- Docker itself doesn't ff CNI but has its own model called Container Network Model(CNM)
+Kubernetes creates docker containers with the None network type and then manually invokes the BRIDGE CNI 
+
+CLuster Networking 
+master node accepts connection on 6443 for kube api access, etcd listen on port 2379. for multi-masters etcd clients comm with each other on port 2380. Services listen on ports 30000-32767
+kubelets on all nodes accepts connection on 10250, kubescheduler accepts on 10259, kube-controller-manager accepts on 10257
+run 'kubectl get nodes -o with = to see internal ip of nodes. to know what network interface is configured for d node, ensure u're in the node and run, 'ip address'. the interface with the internal ip addr of node is the one. it could be 'eth0'
+ip address show type bridge = list all the bridge interface configured by ur container runtime. it could be named 'cni0'
+netstat -npl | grep -i scheduler = To see the port on which kube-scheduler is listening on. (-l display listening server, -p display PID/program name, -n says don't resolve name)
+
+CNI in KUBERNETES
+/opt/cni/bin = location of all supported cni plugins
+/etc/cni/net.d = where which plugin to use and how to use it is configured in d file 10-bridge.conflist for bridge plugin.
+
+
