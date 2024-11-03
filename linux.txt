@@ -1,0 +1,347 @@
+# LINUX SYSTEM ADMINISTRATION TUTORIAL      22/10/2024
+
+# use this directory to create ubuntu linux virtual machine using vagrant. U must have virtualbox installed
+vagrant ssh = ssh into the server after boot by running 
+
+admin users are part of the wheel group
+
+File storage directory
+/etc/hostname = is where your machine hostname is set. run 'hostname' to know ur hostname
+ip addr     = to get ur ip, mac addresses.
+/etc/resolv.conf = is the location where DNS is configured
+
+man <command> e.g 'man date' = make it a habit to use the man command to learn more about commands
+
+CPU
+nproc = list no. of CPU cores of your machine
+lscpu = does the same but provides more details.
+MEMORY
+free =  shows the total amount of physical memory (RAM) installed/used/free in the system.
+dmidecode = provides detailed hardware information, manufacturere, including memory size and type.
+"uname" ---> (-a) prints system info like kernel name(-s=Linux), machine/architecture(-m=x86_64) version(-v=#134-Ubuntu), 
+            release(-r = 5.15.0-124-generic), machine(-m), node hostname(-n=chimezdev)
+"ifconfig OR ip addr show" ---> check a systems current ip address and other interfaces.
+"hostname -I" ---> WILL return only all the IPs for a host excluding the loopback(link-local addr)
+"df -ah" ---> check for free disk space
+---> how do you manage services on a newer linux systems? systemctl status <service_name>(eg nginx)
+"du -sh <dir_name/>" or "stat <filename> ---> chick the size of a dir or file 
+"netstat -tupln" ---> check for open ports, listening, sockets
+"ps -aux | grep nginx" or "top" ---> check cpu usage of a given process say nginx(ps aux | egrep "systemd|PID" = TO see the header)
+"mount /dev/sda2 /mnt ---> how u would mount a storage device(HDD) 2 /mnt
+"mount" or "lsblk" ---> to see all mounted devices(lsblk= list block)
+"/etc/fstab"    ---> to mount a vol at boot, mount it this dir.
+"man <command>" ---> how I lookup commands I don't know.
+
+DISK PARTITION
+sudo 'fdisk -l' = list all storage partitions
+
+date +%Y-%m-%d = returns date
+touch = changes the create date of a file, creates it if it doesn't exist
+unlink newfile.txt = removes a file hardlink
+"rsync" ---> fast, versatile remote(and local) file copying tool (rsync -azhp SRC... USER@]HOST:DEST) 
+
+WHAT'S HAPPENING ON THIS machine?
+'htop' =  To watch in real time processes running in your machine, you can install 'htop'
+'who' = this command lists the user currently logged in
+'whatis <command>' ---> functions like 'man' but looks at d man page of a given command and returns d section that dfines it
+'apropos <command>' ---> searches the man page and returns all instances of the command use.
+'w' = shows more information of current users(who, from where, what they are doing)
+'top' (-c) = monitor processes(what's using the most cpu) equivalent to task manager in windows
+'sudo netstat'(-tupln) = show what's happening on the network(tcp/udp, program, listening, etc)
+'id' = list ur uid, gid, groups belonged to by the user
+
+REDIRECTION & PIPE, FILTERING
+stdin = 0, stdout = 1, stderr = 2
+echo 'write this here' 1> test.txt
+ls -alh non_exiting_file 2> error.txt = the use of '2' b4 '>' means write the error message to the file.
+mail -s 'Mail Subject' <local_user> < test.txt = will send mail with subject -s and content of 'test.txt' as body
+'&&' = If first command is successful, run second one (ls <folder> && cat <file_inside_folder)
+
+PACKAGE MANAGEMENT WITH apt-get
+sudo apt-get update, install, remove
+'sudo apt-cache search <name_of_software_to_install>'
+
+FILE PERMISSION & ACCESS CONTROL 
+chmod 0700 <file_or_dir_name> = changes file permission (owner has rwx)
+chown <user_owner:group> <file_name> = changes file owner
+id = lists ids of the user(UID, GID)
+
+USER ACCOUNT MANAGEMENT
+'sudo useradd -m -d /home/stone -u 2726 -g stone -s /bin/bash stone. You can also use 'newusers' to create user
+'newusers' = pw_name:pw_passwd:pw_uid:pw_gid:pw_gecos:pw_dir:pw_shell
+'passwd <username>' = set password for a user
+/etc/passwd = this directory lists infos of user and kind of shell attached to them by default.
+"vagrant:x:1000:1000:,,,:/home/vagrant:/bin/bash"
+/etc/shadow = list users just like above but displays hashed password of users
+vagrant:$y$j9T$AHkc7T3qMgbg3dFjr5eSx1$.J0kBu39N.5sP7DYQ7OH9JnTU8l4H9ktUL76vs6HpG2:19839:0:99999:7:::
+usermod -L <username> = places '!' before the passwd hash which removes the login access of the user 'vagrant'
+usermod -U <username> = removes the '!'
+/etc/group = group directory
+userdel <username> = deletes a user from both /etc/passwd, /etc/shadow, /etc/group but user's home dir remains
+rm -rf /home/username to remove d users home dir
+
+PROCESSES 
+- what is being done 
+'top' or 'ps aux' = shows processes
+- all processes are created by a parent(PRI) process that fucked itself except 'init(now systemd)' which is the first process created on boot
+PROCESSES SIGNAL
+- signals are how processes communicate to each other and to kernel 
+'kill <process_id>' = to terminate a process
+'killall' = to terminate all processes
+'kill 15'(SIGTERM) = terminate a process
+'kill 9' = kill a process abruptly
+PROCESSES STATE, NICENESS
+'/proc'- linux provides the state of process in the virtual file system '/proc
+- 4 states a process can before
+- Runnable, Sleeping, stopped, zombie(finished and waiting to return output)
+- niceness is just how critical a process is(btw -20 to 19, -20 being very critical-allocate as much cpu to it)
+- niceness of a process is the NI collumn when u run 'top'
+'nice -n 10 /part/to/process' = to run a process with niceness(run 'htop' to get command(part_to_process))
+'renice -n 10 process_id' = to change the niceness of a process
+
+FILESYSTEM
+'df -ah' = displays amount of disk space avail on d filesystem containing each file name arg.
+'du -sh </dir/or_file' = estimate file size
+'ls /' = list all the root filesystem
+'ls -lra' = r for reverse order, a for list all
+/etc ===== dir for all of ur configuration file(when u install app, all config files are kept here)
+/sbin === binaries u've to be root to call
+/bin  === all other binaries(any app u install, d launch binary is here) including commands all user can run e.g 'ls'
+/tmp  === temporary files 
+/lib and /lib64  === shared library and libraries that programs on system can use.
+/home === configuration files for all users
+/media or /mnt == where mounts go automatically(usb, external drive)
+/opt == available on desktop where desktop throw in extra softwares.
+/proc == in proc there is basically 1 directory for each process running on the machine
+/usr === non super essential files and command e.g /usr/bin, /usr/share - things common to multiple systems
+/usr/share/doc ---> just like online docs for various programs these days.
+/var  == contains files that change sizes during normal operation.
+/var/lib == It holds state information, which comprises persistent data that programs modify as they run
+
+LINUX FILE TYPES
+- ls -l to list files with permission
+d = directory, l = links, - = regular files, b = block device(disk)
+c = the junction where device driver say mouse meets the actual hardware
+
+SCHEDULING TASKS WITH CRON 
+program u need to run whether repeating or scheduled.
+/etc/crontab = system-wide crontab location(open with vi to see cronjob syntax)
+'/var/spool/cron/crontabs/<username>' = where users crontab are saved 
+'/etc/cron.d/ = program specific cron jobs are kept here in orther not to polute users own above
+'crontab -l' = each user has crontable(table listing schedules by user)- run the command to list
+'crontab -e' = to edit the user's crontab
+'crontab -e -u <username> = as a root user, run to edit a particular user crontab
+
+TERMINAL SHORTCUTS TO know
+'Ctrl+c' = terminate a long running process
+'Ctrl+d' = exit the shell session(say u login to a rmote server from ur machine. it will return u to ur machine)
+- when typing, hit tab to auto complete(if only a related file exist, press tab once. if more, press twice to lis)
+'Ctrl+l' = clears ur terminal
+'Ctrl+A' = press to go to the begining of line u're typing
+'Ctrl+E = to go to the end of line
+'Ctrl+c' = to get out of what u're typing withou running it.
+'alt+F  = Go forward jumping 2ru words
+'alt+B = backwards jumping 2ru words
+'Ctrl+R' = while typing but want to search ur recent command history, press and type letters to suggest.
+'Ctrl+G' = press to return to what you were typing
+
+ARCHIVING AND COMPRESSION - tar commands
+- tar command has a lot of options
+'tar -zcvf docs.tar.gz <folder_to_arch>' = (-f =zipped_finame, -z = zip, -c = create, -v = verbose(output steps) )
+'tar -zxvf <zipped_finame>' = unzip a zipped file(-x = extract)
+'gzip -9 /path/to/your/logfile.log ---> compresses the logfile.(choose no. btw 1-9, 9 being highest but slowest)
+
+
+BASH SCRIPTING
+'wc -l < test.txt' or 'cat test.txt | wc -l
+() groups just like normal programming
+Variables and Quoting
+$ = signifies Variable call
+myvar="this is wonderful"  === to assign Variable(note that no space b4 and after d '=' sign)
+${some_var}th beet = curly brackets to delimit
+"there are `wc -l < /etc/group` number of lines" === back ticks for command substitution
+'which bash' === run to see what to start ur bash script with.
+'exit 0' === return value are btw 0-255(0 means no error encountered)
+'exit' or 'exit $?'  === nacked exiting will return the return value of the last line of the script
+'chmod +x hellow.sh' === add execute permission to the file for everyone
+'./hellow.sh' or 'bash hellow.sh' or 'source hellow.sh' ===different ways to execute a script
+'source hellow.sh' or '. hellow.sh' === runs 2ru ur script and makes Variables dfnd in the script avail
+
+ARGUMENTS
+'$0' == the zero variable is auto assigned the script name (filename=$0)
+'$#' == no of arg a script is called with is assigned the # variable
+'./hellow.sh arg1 arg2 arg3' == how to call a script with arguments.
+
+IF AND TESTING
+if [[ "$NAME" == "Stone" ]]; then
+    echo "Hi Stone!"
+elif [["NAME" == "Steve" ]]; then
+    echo $2
+else
+    echo $3
+fi
+
+using less than
+-lt == means less than
+
+if [[ $# -lt NUM_REQUIRED_ARGS ]]; then
+    echo "Not enough arguments. Call this script with {$0} <name> <number>"
+fi
+
+Equality (= and !=)
+!=  Not equal sign
+
+Null (-n) or Zero length (-z)
+notnull="This is something (not nothing)"
+nully=""
+if [ -n "$notnull" ]; then
+    echo "This is not nully
+fi
+if [ -f /etc/bash.bashrc ]: then ---- checks if the specified file exist and is a regular file
+
+if [ -z "$nully" ]; then
+    echo "nully/zerooo (length)"
+fi
+
+# greater than(-gt), less than(-lt), greater than equal(-ge), less than equal(-le)
+# string comparison operators can be usedd with double parentheses
+if (( $int1 == $int2 )); then
+    echo "${int1} is equal to ${int2}."
+fi
+
+FUNCTION AND LOOP
+for arg in "$@"; do    # "$@" - is like a list in other lang. 'arg' is just like 'i'
+    echo "$arg"
+done
+# see 'hellow.sh' for example
+
+
+PATH VARIABLE 
+PATH=$PATH:/some/dir/here - adding a path to PATH variable(use absolute path to scripts u're working)
+~/.bash_profile === add ur path here to make it permanent.
+'/etc/profile' === path here gets set when a bash terminal starts 
+'/etc/profile.d/ === each of the files in the dir can change the variable that is first set in /etc/profile when bash starts
+-- its preferable to change a single user path in /home/username/.bash_profile
+-- for root, do it in '/root/.bash_profile
+-- for all except for root, do it in '/etc/profile' just before the 'export PATH...' line
+
+
+LINUX COMMAND, 'script' RECORDS YOUR SHELL SESSIONS
+- This is useful especially for documentation.
+- simply type 'script' and start whatever you want to do in your server. It will record d session
+"Script started, output log file is 'typescript'."
+'script session.log' == to change the default file name where script stores recorded session
+REPLAYING A SCRIPT log
+'script <script_name.log> --timing=time.log' === records ur session in real-time and can be replayed.
+'scriptreplay -s <script_name.log> -t time.log == to replay the session 
+"script -c 'netstat' netstat.log" == run the command 'netstat' and store the output in 'netstat.log'
+
+SHELL ALIASES
+'alias' == list all alias set in ur open shell session
+'alias lr="ls -lra" == assign the list all comand to ls
+'.bashrc' == include the alias here to persist it any shell u open.
+
+8 BASIC lsof COMMAND FOR Sysadmin
+- lsof == stands for 'list open files'
+'lsof' === list all opened files and what process opened it
+'lsof <path_to_open_file>' === returns which process opened the file 
+'lsof -p <process_id>' === list all files this process opened
+'lsof -u <username>' === list files currently opend by username
+'lsof -i :80'   == which processes are listening on port 80
+'lsof -i TCP'   == which processes are listening on TCP protocol
+
+MONITORING WITH MONIT 
+'apt-get install monit' 'systemctl enable monit' 'systemctl start monit'
+'mv /etc/monit/monitrc /etc/monit/monitrc-ORIG' === edit monit config file 
+'vi /monit/monitrc  === create new monitrc file 
+
+
+SERVICE MANAGEMENT WITH systemd
+- systemd is the replacement of init
+'systemctl' if for systemd which is replacing 'service' which is for init
+'journalctl' is for log management.
+Example commands
+'systemctl status mysql' ------> 'service mysql status'(init equivalent)
+'systemctl start nginx php5-fpm monit'
+'systemctl enable mysql nginx php5-fpm monit'
+Sample journalctl commands(Use to view and filter logs in systems using systemd)
+'journalctl -xn' ---> shows most recent log entries(-n=no of lines, -x=provides log context and suggestions),
+'journalctl -u <unit>' ---> (get log entry 4rm a specific service)
+'journalctl -b' ---> shows logs since d last boot 
+'journalctl -f' ---> follows d log in real time(similar to 'tail -f) 
+'journalctl --since "10 min ago"' ---> shows log entries 4rm specific time
+
+TECHNICAL DEBT 
+- this is the consequences for decisions that have been made. things that cost you time and energy
+- while they exist, and make other things more expensive
+E.G - undocumented(or misdocumented) code, projects missing a component(security, automation)
+-special snowflakes servers(old servers no one wants to touch as its running legacy workload)
+WHERE it costs u includes: - adding features - maintenance, -training, -estimate
+HOW TO PAY OFF Tech DEBT
+- create tickets/projects for repayment WHEN u decide(or are told) to do things which cr8 tech debt 
+- dedicate 1day/wk to pay back tech debt
+- learn how to communicate to ur managers and businesspeople about it
+- manage your managers. if they don't see it as real problems, stop offering up potential soln 
+- stop being optimistic with ur estimate
+
+RESOURCES FOR BECOMING A LINUX SYS ADMIN 
+- Networking for sysadmins = Lucas
+- UNIX and Linux system Administration Handbook = Evi Nemeth
+- https://help.ubuntu.com/community/Servers 
+
+
+THE "tee" COMMAND
+- Say u're doing 'echo "any thing here" >> mylog.log' on one terminal shell and want to monitor 'mylog.log'
+- in real time(tail -f) on another terminal
+- You can achieve the above using a single terminal with the help of "tee" command
+"date | tee mylog.log" ---> tells 'tee' command to write the ouput of 'date' command to 'mylog.log' file and also output on my shell in realtime
+"date | tee -a mylog.log" ---> using '-a' means don't overight
+
+BACKUP AND RESTORE A MYSQL/MariaDB DATABASE(AUTOMATED)
+- 1st step is to store d mysql root passwd in /root/.my.cnf so our script(running as root) can access it.
+- change the permission so only d root owner can access it. 'chmod 0600'
+---> FILE content:
+[client]
+user=root
+password=yourmysqlrootpass
+---> BACKUP ONE USER DATABASE run d below command in your script or cronjob
+"mysqldump --add-drop-table --databases chimez > /home/chimez/backups/db/$(/bin/date +%Y-%m-%d).sql.bak"
+"mkdir -p /home/chimez/backups/db/" ---> to create the dir 
+- "--add-drop-table" ---> means drop all tables and do a clean fresh backup.
+"vi /etc/crontab" ---> paste the above command to schedule the job 
+
+
+For RESTORE
+- go to the dir that contains ur backup (/home/chimez/backups/db)
+'mysql -u root [database_name] < backupname.sql.bak' ---> restore a single db 
+'mysql -uroot -p < alldatabases.sql ---> to restore all databses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TMUX TUTORIAL
+- a package to detach/reattach from ssh session without terminating. u can share session with colleague(type on the same shell)
+'tmux new-session -s chemezdev' = creates new session
+'tmux list-sessions'
+'tmux attach -t chimezdev'
+'tmux' = starts tmux.
+'ctrl-b' = pressing this(tells ur shell that following comand is for tmux) 
+'ctrl-b c' or 'tmux new-window = creates a new tmux window.(hold down 'ctrl' type b, release 'ctrl' and type c)
+'ctrl-b ,' = renames a window
+'ctrl-b p' or 'ctrl-b n' = switch btw windows
+'ctrl+b w' = to list windows. press again to leave
+'ctrl+b :' = to enter and type tmux command 
+'ctrl+b %' = splits tmux window vertically
+'ctrl+b &' = close tmux window(session if the last window)
+
