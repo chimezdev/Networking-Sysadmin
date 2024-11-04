@@ -1,2 +1,4 @@
-./.vagrant
+.vagrant
 ./kubectl.exe
+rootalert/venv
+*.key
