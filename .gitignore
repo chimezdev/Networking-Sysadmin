@@ -2,3 +2,4 @@
 ./kubectl.exe
 rootalert/venv
 *.key
+# rootalert/secrets.env
