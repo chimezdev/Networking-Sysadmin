@@ -1,0 +1,13 @@
+[Unit]
+Description=Sends sms alert when user ssh into our server or becomes a root user
+After=network.target
+
+[Install]
+WantedBy=multi-user.target 
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/rootalert/rootalert.py
+EnvironmentFile=/usr/rootalert/secrets.env
+Restart=always
+User=root 

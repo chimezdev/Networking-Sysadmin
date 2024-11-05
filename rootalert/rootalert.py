@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import os
 import time
@@ -6,6 +7,8 @@ import logging
 import subprocess, select
 from datetime import datetime
 
+log = logging.getLogger('ssh/rootAlert')
+log.setLevel(logging.INFO)
 # access required env vars
 try:
     vonage_api_key = os.getenv("VONAGE_API_KEY")
@@ -26,7 +29,7 @@ sms = vonage.Sms(client)
 
 def poll_logfile(filename):
     # Polls the /var/log/auth log for ssh logins or sudo commands.
-    with subprocess.Popen(["tail", "-F", "-n", "0", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+    with subprocess.Popen(["tail", "-F", "-n", "0", filename], encoding="utf8", stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
     
         # a poll object to check for new data in the logfile
         poller = select.poll()
