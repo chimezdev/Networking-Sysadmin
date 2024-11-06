@@ -7,7 +7,7 @@ WantedBy=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /usr/rootalert/rootalert.py
-EnvironmentFile=/usr/rootalert/secrets.env
+ExecStart=/home/ubuntu/rootalert/venv/bin/python3 /home/ubuntu/rootalert/rootalert.py
+EnvironmentFile=/home/ubuntu/rootalert/secrets.env
 Restart=always
-User=root 
+User=root

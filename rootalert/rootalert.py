@@ -63,7 +63,7 @@ def send_sms(log):
         }
     )
 
-    if response["messages"][0]["status"] == 0:
+    if response["messages"][0]["status"] == "0":
         logging.info("Message sent to {} at {}".format(target_phone_number, datetime.now))
         return("Message sent to {} at {}".format(target_phone_number, datetime.now))
     else:
