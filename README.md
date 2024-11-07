@@ -36,8 +36,8 @@ TARGET_PHONE_NUMBER=RECEIVER_PHONE_NUMBER
 SOURCE_NUMBER=SOURCE
 ```
 
-## copy this repo over, adjust paths in sshalert.service
-## copy sshalert.service to /etc/systemd/system/ into whichever target directory you want (probably multi-user)
+Copy this repo over, adjust paths in ***rootalert.service***
+Copy ***rootalert.service*** to /etc/systemd/system/ into whichever target directory you want (probably multi-user)
 ```
 systemctl list-unit-files
 systemctl daemon-reload
