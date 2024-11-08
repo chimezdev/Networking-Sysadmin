@@ -1,7 +1,7 @@
 
 # SSH/ROOT ALERT SCRIPT
 
-The "rootalert folder" contains python script that sends sms alert when a user ssh into this machine or becomes a root user. This project idea and original code is from David. [Github](https://github.com/groovemonkey/sshalert)
+The "rootalert folder" contains python script that sends sms alert when a user ssh into the server where this code is running as a systemd service or becomes a root user. This project idea is from David. [Github](https://github.com/groovemonkey/sshalert)
 
 ## INSTALLATION
 
